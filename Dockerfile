@@ -17,7 +17,7 @@ RUN set -eu; \
     apt -y dist-upgrade; \
     apt -y autoremove; \
     apt -y autoclean; \
-    apt -y install tzdata locales-all aptitude curl tini unzip; \
+    apt -y install tzdata locales-all aptitude curl tini unzip libelf-dev; \
     ln -sf /etc/zoneinfo/Etc/UTC /etc/localtime; \
     apt -y install locales; \
     update-locale LANG=en_GB.UTF-8; \
