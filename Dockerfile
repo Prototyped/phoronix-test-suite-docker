@@ -1,4 +1,4 @@
-FROM public.ecr.aws/debian/debian:bookworm-slim as staging
+FROM --platform=linux/arm/v7 public.ecr.aws/debian/debian:bookworm-slim as staging
 
 COPY phoronix-test-suite.xml /etc/phoronix-test-suite.xml
 
@@ -9,10 +9,10 @@ RUN set -eu; \
     export DEBIAN_FRONTEND; \
     apt -y update; \
     apt -y install ca-certificates; \
-    echo deb https://www-uxsup.csx.cam.ac.uk/pub/linux/debian/ bookworm main contrib non-free > /etc/apt/sources.list; \
-    echo deb-src https://www-uxsup.csx.cam.ac.uk/pub/linux/debian/ bookworm main contrib non-free >> /etc/apt/sources.list; \
-    echo deb https://cdn-aws.deb.debian.org/debian-security/ testing-security main contrib non-free >> /etc/apt/sources.list; \
-    echo deb-src https://cdn-aws.deb.debian.org/debian-security/ testing-security main contrib non-free >> /etc/apt/sources.list; \
+    echo 'deb [arch=armhf] https://www-uxsup.csx.cam.ac.uk/pub/linux/debian/ bookworm main contrib non-free' > /etc/apt/sources.list; \
+    echo 'deb-src https://www-uxsup.csx.cam.ac.uk/pub/linux/debian/ bookworm main contrib non-free' >> /etc/apt/sources.list; \
+    echo 'deb [arch=armhf] https://cdn-aws.deb.debian.org/debian-security/ testing-security main contrib non-free' >> /etc/apt/sources.list; \
+    echo 'deb-src https://cdn-aws.deb.debian.org/debian-security/ testing-security main contrib non-free' >> /etc/apt/sources.list; \
     apt -y update; \
     apt -y dist-upgrade; \
     apt -y autoremove; \
@@ -31,7 +31,16 @@ RUN set -eu; \
     rm -rf /var/cache/apt/archives/* /var/lib/apt/lists/*.*; \
     find /var/lib/phoronix-test-suite/installed-tests -type f \( -name \*.tar.bz2 -o -name \*.tar.gz -o -name \*.tar.xz -o -name \*.7z -o -name \*.zip \) \! -path \*build-\* -print0 | xargs -0 rm -f
 
-ENTRYPOINT ["tini", "--", "chrt", "99", "phoronix-test-suite", "batch-run", "pts/build-linux-kernel", "pts/build-mplayer", "pts/compress-bzip2", "pts/compress-xz", "pts/encode-flac", "pts/gcrypt", "pts/openssl", "pts/stream", "pts/x264", "pts/graphics-magick-2.1.0"]
+RUN set -eu; \
+    DEBIAN_FRONTEND=noninteractive; \
+    export DEBIAN_FRONTEND; \
+    cd /var/lib/phoronix-test-suite/installed-tests/pts/stream-*; \
+    INSTALL_SH="../../../test-profiles/pts/$(basename "$PWD")/install.sh"; \
+    sed -ri 's/^STREAM_ARRAY_SIZE=.+$/STREAM_ARRAY_SIZE=33554432/' "$INSTALL_SH"; \
+    bash -x "$INSTALL_SH"
+
+#ENTRYPOINT ["tini", "--", "chrt", "99", "phoronix-test-suite", "batch-run", "pts/build-linux-kernel", "pts/build-mplayer", "pts/compress-bzip2", "pts/compress-xz", "pts/encode-flac", "pts/gcrypt", "pts/openssl", "pts/stream", "pts/x264", "pts/graphics-magick-2.1.0"]
+ENTRYPOINT ["/bin/bash"]
 WORKDIR /root
 USER 0:0
 VOLUME /root
