@@ -1,4 +1,4 @@
-FROM --platform=linux/arm/v7 public.ecr.aws/debian/debian:bookworm-slim as staging
+FROM --platform=linux/arm/v7 docker.io/arm32v7/debian:bookworm-slim as staging
 
 COPY phoronix-test-suite.xml /etc/phoronix-test-suite.xml
 
@@ -9,8 +9,8 @@ RUN set -eu; \
     export DEBIAN_FRONTEND; \
     apt -y update; \
     apt -y install ca-certificates; \
-    echo 'deb [arch=armhf] https://www-uxsup.csx.cam.ac.uk/pub/linux/debian/ bookworm main contrib non-free' > /etc/apt/sources.list; \
-    echo 'deb-src https://www-uxsup.csx.cam.ac.uk/pub/linux/debian/ bookworm main contrib non-free' >> /etc/apt/sources.list; \
+    echo 'deb [arch=armhf] https://mirror.apps.cam.ac.uk/pub/linux/debian/ bookworm main contrib non-free' > /etc/apt/sources.list; \
+    echo 'deb-src https://mirror.apps.cam.ac.uk/pub/linux/debian/ bookworm main contrib non-free' >> /etc/apt/sources.list; \
     echo 'deb [arch=armhf] https://cdn-aws.deb.debian.org/debian-security/ testing-security main contrib non-free' >> /etc/apt/sources.list; \
     echo 'deb-src https://cdn-aws.deb.debian.org/debian-security/ testing-security main contrib non-free' >> /etc/apt/sources.list; \
     apt -y update; \
