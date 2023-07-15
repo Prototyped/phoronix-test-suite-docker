@@ -1,4 +1,4 @@
-FROM --platform=linux/arm/v7 public.ecr.aws/debian/debian:bookworm-slim as staging
+FROM --platform=linux/arm64/v8 docker.io/arm64v8/debian:bookworm-slim as staging
 
 COPY phoronix-test-suite.xml /etc/phoronix-test-suite.xml
 
